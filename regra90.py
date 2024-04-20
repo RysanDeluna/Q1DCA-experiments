@@ -10,37 +10,36 @@ from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import QiskitRuntimeService
 
 from classes.CellularAutomata import Cell, CellularAutomata
+from classes.Simulators import Simulator
 
-# Functions ------------------------------
+# FUNCTIONS ------------------------------
 
-def simulate_noise(circuit):
-    aersim_backend = AerSimulator.from_backend(QiskitRuntimeService().get_backend("ibm_kyoto"))
-    return aersim_backend.run(circuit, shots=1).result()
+def prepare_rule90(qc: qiskit.QuantumCircuit):
+    qc.h([0,1,2])
 
+    # Middle bit
+    qc.cx([0,2,3],[3,3,1])
+    qc.barrier()
+    qc.reset(3)
 
-def simulate_ideal(circuit):
-    return AerSimulator().run(circuit, shots=1).result()
+    # Left bit
+    qc.cx([1,3],[3,2])
+    qc.barrier()
+    qc.reset(3)
 
+    # Right bit
+    qc.cx([1,3],[3,0])
+    qc.barrier()
+    qc.reset(3)
 
-def oracle(qc: qiskit.QuantumCircuit):
-    for i in range(2):
-        qc.h(i)
-    qc.ccx(0,1,2)
-
-
-def rodar(ca, t):
-    qc = qiskit.QuantumCircuit(len(ca.cells))
-    for cell in range(len(ca.cells)):
-        if ca.cells.is_alive(): qc.x(cell)
-
-    for _ in range(t):
-        for cell in ca.cells:
-            print(sim)
-
+    qc.h([0,1,2])
+    return qc
 
 
 # MAIN -----------------------------------
 if __name__ == "__main__":
-    config = "010"
-    ca = CellularAutomata(len(config))
-
+    sim = Simulator("ibm_kyoto")
+    qc = prepare_rule90(qiskit.QuantumCircuit(4))
+    qc.measure_all()
+    sim.run_ideal(qc)
+    print(sim.results["ideal"].get_counts())
