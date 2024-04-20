@@ -9,7 +9,7 @@ import qiskit
 from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import QiskitRuntimeService
 
-from CellularAutomata import Cell, CellularAutomata
+from classes.CellularAutomata import Cell, CellularAutomata
 
 # Functions ------------------------------
 
